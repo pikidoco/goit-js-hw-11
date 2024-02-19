@@ -28,6 +28,8 @@ async function fetchImages(q, page, perPage) {
             image_type: 'photo',
             orientation: 'horizontal',
             safesearch: true,
+          page:page,
+          per_page:perPage,
         },
     });
     return response.data;
@@ -69,7 +71,12 @@ async function onLoadMore() {
         const searchImages = data.hits;
 
         if (searchImages.length > 0) {
-            createMarkup(searchImages);
+            const newImages = searchImages.filter(image => {
+                const existingUrls = Array.from(gallery.querySelectorAll('img')).map(img => img.src);
+                return !existingUrls.includes(image.webformatURL);
+            });
+
+            createMarkup(newImages);
             lightbox.refresh();
             if (gallery.children.length >= data.totalHits) {
                 loadMoreBtn.classList.add('is-hidden');
